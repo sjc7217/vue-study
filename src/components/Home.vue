@@ -9,9 +9,17 @@
     </el-header>
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside width="200px">
+      <el-aside :width = "isCollapse ? '64px':'200px'">
+        <div class="toggle-button" @click="toggleCollapse">
+            |||
+        </div>
         <!-- 侧边栏菜单区域 -->
-        <el-menu background-color="#333744" text-color="#fff" active-text-color="#ffd04b">
+        <el-menu background-color="#333744" 
+            text-color="#fff" 
+            active-text-color="#409eff" 
+            unique-opened 
+            :collapse="isCollapse"
+            :collapse-transition="false">
           <!-- 一级菜单 -->
           <el-submenu :index="item.id+''" v-for="item in menulist" :key="item.id">
             <!-- 一级菜单模版区域 -->
@@ -27,7 +35,7 @@
               <!-- 二级菜单模版区域 -->
               <template slot="title">
                 <!-- 图标 -->
-                <i class="el-icon-location"></i>
+                <i class="el-icon-menu"></i>
                 <!-- 文字 -->
                 <span>{{ subItem.authName }}</span>
               </template>
@@ -45,7 +53,8 @@
 export default {
   data: function(){
       return {
-          menulist:[]
+          menulist:[],
+          isCollapse: false
       }
   },
   created: function(){
@@ -65,6 +74,9 @@ export default {
             this.menulist = res.data
             //console.log(this.menulist)
         }
+    },
+    toggleCollapse: function(){
+        this.isCollapse = !this.isCollapse
     }
   }
 };
@@ -94,9 +106,22 @@ export default {
 
 .el-aside {
   background-color: #333744;
+  .el-menu{
+      border-right: none;
+  }
 }
 
 .el-main {
   background-color: #eaedf1;
+}
+
+.toggle-button{
+    background-color: #4a5064;
+    font-size: 10px;
+    line-height: 24px;
+    text-align: center;
+    color: #fff; 
+    letter-spacing: 0.2em;
+    cursor: pointer;
 }
 </style>
