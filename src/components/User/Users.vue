@@ -16,7 +16,7 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="dialogVisible = true">添加用户</el-button>
+          <el-button type="primary" @click="addDialogVisible = true">添加用户</el-button>
         </el-col>
       </el-row>
 
@@ -41,9 +41,9 @@
             </template>
         </el-table-column>
         <el-table-column label="操作" width="180px">
-          <template >
+          <template slot-scope="scope">
             <!-- 修改按钮 -->
-            <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row.id)"></el-button>
             <!-- 删除按钮 -->
             <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
             <!-- 分配角色按钮 -->
@@ -67,7 +67,7 @@
     </el-card>
 
     <!-- 添加用户对话框 -->
-    <el-dialog title="添加用户" :visible.sync="dialogVisible" width="50%">
+    <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="50%" @close="addDialogClose">
       <!-- 内容主题区域 -->
       <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px" >
         <el-form-item label="用户名" prop="username">
@@ -85,8 +85,29 @@
       </el-form>
       <!-- 底部区域 -->
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addUser">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 修改用户对话框 -->
+    <el-dialog title="修改用户" :visible.sync="editDialogVisible" width="50%" @close="editDialogClose">
+      <!-- 内容主题区域 -->
+      <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="70px" >
+        <el-form-item label="用户名" >
+          <el-input v-model="editForm.username" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="editForm.email" ></el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop="mobile">
+          <el-input v-model="editForm.mobile" ></el-input>
+        </el-form-item>
+      </el-form>
+      <!-- 底部区域 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" >确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -127,14 +148,19 @@ export default {
       },
       userlist: [], 
       total: 0,
-      //控制对话框是否可见
-      dialogVisible: false,
+      //控制添加对话框是否可见
+      addDialogVisible: false,
+      //控制修改对话框是否可见
+      editDialogVisible: false,
       //添加用户数据
       addForm: {
         username: '',
         password: '',
         email:'',
         mobile:''
+      },
+      editForm: {
+
       },
       //添加用户时的数据验证规则
       addFormRules: {
@@ -154,7 +180,16 @@ export default {
           { required: true, message: '请输入手机号', trigger: 'blur' },
           { validator: checkMobile, trigger: 'blur'}
         ]
-        
+      },
+      editFormRules: {
+        email:[
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur'}
+        ],
+        mobile:[
+          { required: true, message: '请输入手机号', trigger: 'blur' },
+          { validator: checkMobile, trigger: 'blur'}
+        ]
       }
     };
   },
@@ -193,6 +228,37 @@ export default {
       }else{
         this.$message.success("更新用户状态成功！")
       }
+    },
+    //添加对话框关闭事件
+    addDialogClose: function(){
+      this.$refs.addFormRef.resetFields()
+    },
+    //修改对话框关闭事件
+    editDialogClose: function(){
+      this.$refs.editFormRef.resetFields()
+    },
+    // 点击按钮，添加新用户
+    addUser(){
+      this.$refs.addFormRef.validate(async valid=>{
+        if(!valid) return this.$message.error("数据校验不通过！")
+        const {data: res} = await this.$http.post('users', this.addForm)
+        if(res.meta.status !== 201){
+          return this.$message.error("添加用户失败！")
+        }else{
+          this.$message.success("添加用户成功！")
+        }
+        this.addDialogVisible = false
+        this.getUserList()
+      })
+    },
+    //显示编辑用户对话框
+    async showEditDialog(id){
+      const {data: res} = await this.$http.get('users/'+ id)
+      if(res.meta.status !== 200){
+        return this.$message.error("获取用户信息失败！")
+      }
+      this.editForm = res.data
+      this.editDialogVisible = true
     }
 
   }
