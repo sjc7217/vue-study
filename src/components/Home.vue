@@ -19,7 +19,9 @@
             active-text-color="#409eff" 
             unique-opened 
             :collapse="isCollapse"
-            :collapse-transition="false">
+            :collapse-transition="false"
+            router
+            :default-active="activePath">
           <!-- 一级菜单 -->
           <el-submenu :index="item.id+''" v-for="item in menulist" :key="item.id">
             <!-- 一级菜单模版区域 -->
@@ -31,7 +33,11 @@
             </template>
 
             <!-- 二级菜单 -->
-            <el-menu-item :index="subItem.id+''" v-for="subItem in item.children" :key="subItem.id">
+            <el-menu-item 
+                :index="'/' + subItem.path" 
+                v-for="subItem in item.children" 
+                :key="subItem.id"
+                @click="saveNaviState('/' + subItem.path)">
               <!-- 二级菜单模版区域 -->
               <template slot="title">
                 <!-- 图标 -->
@@ -57,11 +63,13 @@ export default {
   data: function(){
       return {
           menulist:[],
-          isCollapse: false
+          isCollapse: false,
+          activePath: ''
       }
   },
   created: function(){
       this.getMenuList()
+      this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
     logout: function() {
@@ -80,6 +88,11 @@ export default {
     },
     toggleCollapse: function(){
         this.isCollapse = !this.isCollapse
+    },
+    //保存路由状态
+    saveNaviState: function(activePath){
+        window.sessionStorage.setItem("activePath", activePath)
+        this.activePath = activePath
     }
   }
 };
