@@ -107,7 +107,7 @@
       <!-- 底部区域 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialogVisible = false">取 消</el-button>
-        <el-button type="primary" >确 定</el-button>
+        <el-button type="primary" @click="editUser">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -259,6 +259,21 @@ export default {
       }
       this.editForm = res.data
       this.editDialogVisible = true
+    },
+    // 点击按钮，更新用户信息
+    editUser(){
+      this.$refs.editFormRef.validate(async valid=>{
+        if(!valid) return this.$message.error("用户信息校验失败！")
+        const {data: res} = await this.$http.put('users/' + this.editForm.id, {email: this.editForm.email, mobile: this.editForm.mobile})
+        if(res.meta.status !== 200){
+          return this.$message.error("修改用户信息失败！")
+        }
+        //关闭对话框
+        this.editDialogVisible = false
+        //刷新页面
+        this.getUserList()
+        this.$message.success("修改用户信息成功！")
+      })
     }
 
   }
