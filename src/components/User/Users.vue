@@ -95,6 +95,28 @@
 <script>
 export default {
   data() {
+    //验证邮箱规则
+    var checkEmail = (rule, value, cb)=>{
+      // 邮箱正则
+      const regEmail=/^([A-Za-z0-9_-])+@([A-Za-z0-9_-])+\.([A-Za-z]{2,4})$/
+      if(regEmail.test(value)){
+        //合法邮箱
+        return cb()
+      }
+      // 格式不正确
+      cb(new Error("请输入正确的邮箱！"))
+    }
+    //验证手机号规则
+    var checkMobile = (rule, value, cb)=>{
+      // 手机号正则
+      const regEmail=/^1[3456789]\d{9}$/
+      if(regEmail.test(value)){
+        //合法
+        return cb()
+      }
+      // 格式不正确
+      cb(new Error("请输入正确的手机号！"))
+    }
     return {
       queryInfo: {
         query: "",
@@ -126,11 +148,11 @@ export default {
         ],
         email:[
           { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
+          { validator: checkEmail, trigger: 'blur'}
         ],
         mobile:[
           { required: true, message: '请输入手机号', trigger: 'blur' },
-          { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
+          { validator: checkMobile, trigger: 'blur'}
         ]
         
       }
