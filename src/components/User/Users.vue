@@ -22,11 +22,22 @@
 
       <!-- 用户信息列表区 -->
       <el-table :data="userlist" border stripe>
+        <el-table-column type="index" ></el-table-column>
         <el-table-column prop="username" label="姓名" ></el-table-column>
         <el-table-column prop="email" label="邮箱" ></el-table-column>
         <el-table-column prop="mobile" label="电话" ></el-table-column>
         <el-table-column prop="role_name" label="角色" ></el-table-column>
-        <el-table-column prop="mg_state" label="状态" ></el-table-column>
+        <el-table-column label="状态" >
+            <!-- 作用域插槽，父组件使用子组件的数据 -->
+            <!-- 参考:https://juejin.im/post/5a69ece0f265da3e5a5777ed -->
+            <template slot-scope="scope">
+                <el-switch
+                    v-model="scope.row.mg_state"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949">
+                </el-switch>
+            </template>
+        </el-table-column>
         <el-table-column label="操作" ></el-table-column>
       </el-table>
     </el-card>
