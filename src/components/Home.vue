@@ -43,10 +43,28 @@
 
 <script>
 export default {
+  data: function(){
+      return {
+          menulist:[]
+      }
+  },
+  created: function(){
+      this.getMenuList()
+  },
   methods: {
     logout: function() {
       window.sessionStorage.clear();
       this.$router.push("/login");
+    },
+    getMenuList: async function(){
+        const { data:res } = await this.$http.get('menus')
+        //console.log(data)
+        if(res.meta.status !== 200){
+            return this.$message.error(res.meta.msg)
+        }else{
+            this.menulist = res.data
+            //console.log(this.menulist)
+        }
     }
   }
 };
