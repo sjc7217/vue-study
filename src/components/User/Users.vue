@@ -34,7 +34,9 @@
                 <el-switch
                     v-model="scope.row.mg_state"
                     active-color="#13ce66"
-                    inactive-color="#ff4949">
+                    inactive-color="#ff4949"
+                    @change="userStateChanged(scope.row)"
+                    >
                 </el-switch>
             </template>
         </el-table-column>
@@ -105,6 +107,17 @@ export default {
       //console.log(newPage)
       this.queryInfo.pagenum = newPage
       this.getUserList()
+    },
+    //监听switch状态改变
+    userStateChanged: async function(row){
+      //console.log(row)
+      const {data: res} = await this.$http.put(`users/${row.id}/state/${row.mg_state}`)
+      if(res.meta.status !== 200){
+        row.mg_state = !row.mg_state
+        return this.$message.error("更新用户状态失败！")
+      }else{
+        this.$message.success("更新用户状态成功！")
+      }
     }
 
   }
