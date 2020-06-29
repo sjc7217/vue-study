@@ -11,7 +11,30 @@
     <el-card class="box-card">
         <!-- 用户信息列表区 -->
         <el-table :data="roleLists" border stripe>
-        <el-table-column type="expand" ></el-table-column>
+        <el-table-column type="expand" >
+            <template slot-scope="scope">
+                <el-row :class="['vcenter','bdbottom', i === 0? 'bdtop':'']" v-for="(item, i) in scope.row.children" :key="item.id">
+                    <!-- 渲染一级权限 -->
+                    <el-col :span="5">
+                        <el-tag>{{ item.authName }}</el-tag>
+                        <i class="el-icon-caret-right"></i>
+                    </el-col>
+                    <!-- 渲染二级权限 -->
+                    <el-col :span="19" >
+                        <el-row :class="['vcenter','bdbottom', i2 === 0? 'bdtop':'']" v-for="(item2, i2) in item.children" :key="i2">
+                            <el-col :span="6">
+                                <el-tag type="success">{{ item2.authName }}</el-tag>
+                                <i class="el-icon-caret-right"></i>
+                            </el-col>
+                            <!-- 渲染三级权限 -->
+                            <el-col :span="18">
+                                <el-tag type="warning" v-for="(item3, i3) in item2.children" :key="i3">{{ item3.authName }}</el-tag>
+                            </el-col>
+                        </el-row>
+                    </el-col>
+                </el-row>
+            </template>
+        </el-table-column>
         <el-table-column type="index" ></el-table-column>
         <el-table-column label="角色名称" prop="roleName"></el-table-column>
         <el-table-column label="角色描述" prop="roleDesc" ></el-table-column>

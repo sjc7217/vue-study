@@ -21,3 +21,19 @@ html, body, #app {
 .el-pagination {
     padding-top: 15px;
 }
+
+.bdtop {
+    border-top: 1px solid #eee;
+}
+
+.bdbottom {
+    border-bottom: 1px solid #eee;
+}
+.el-tag{
+    margin: 5px 5px;
+}
+
+.vcenter{
+    display: flex;
+    align-items: center;
+}
