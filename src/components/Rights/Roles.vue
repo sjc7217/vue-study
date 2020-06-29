@@ -46,12 +46,23 @@
                 <el-button type="danger" icon="el-icon-delete" size="mini" >删除</el-button>
                 <!-- 分配角色按钮 -->
                 <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
-                <el-button type="warning" icon="el-icon-setting" size="mini">分配权限</el-button>
+                <el-button type="warning" icon="el-icon-setting" size="mini" @click="showSetRightDialog">分配权限</el-button>
                 </el-tooltip>
           </template>
         </el-table-column>
         </el-table>
     </el-card>
+
+    <!-- 修改用户权限对话框 -->
+    <el-dialog title="分配权限" :visible.sync="setRightDialogVisable" width="50%" >
+      <!-- 树形控件 -->
+      <el-tree :data="rightsList" :props="treeProps" ></el-tree>
+      <!-- 底部区域 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRightDialogVisable = false">取 消</el-button>
+        <el-button type="primary" >确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
   
 </template>
@@ -60,7 +71,14 @@
 export default {
     data(){
         return {
-            roleLists: []
+            roleLists: [],
+            setRightDialogVisable: false,
+            rightsList: [],
+            //树形结构描述信息
+            treeProps: {
+                children: 'children',
+                label: 'authName'
+            }
         }
     },
     methods: {
@@ -90,6 +108,13 @@ export default {
             //this.getRolesList()
             //仅更新部分数据
             role.children = res.data
+        },
+        //展示分配权限的对话框
+        async showSetRightDialog(){
+            const {data: res} = await this.$http.get('rights/tree')
+            this.rightsList = res.data
+            console.log(this.rightsList)
+            this.setRightDialogVisable = true
         }
 
     },
