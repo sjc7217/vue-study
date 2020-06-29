@@ -45,7 +45,7 @@
                 <!-- 删除按钮 -->
                 <el-button type="danger" icon="el-icon-delete" size="mini" >删除</el-button>
                 <!-- 分配角色按钮 -->
-                <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
+                <el-tooltip effect="dark" content="分配权限" placement="top" :enterable="false">
                 <el-button type="warning" icon="el-icon-setting" size="mini" @click="showSetRightDialog(scope.row)">分配权限</el-button>
                 </el-tooltip>
           </template>
@@ -54,13 +54,13 @@
     </el-card>
 
     <!-- 修改用户权限对话框 -->
-    <el-dialog title="分配权限" :visible.sync="setRightDialogVisable" width="50%" >
+    <el-dialog title="分配权限" :visible.sync="setRightDialogVisable" width="50%" @close="setRightDialogClose">
       <!-- 树形控件 -->
-      <el-tree :data="rightsList" :props="treeProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defKeys"></el-tree>
+      <el-tree :data="rightsList" :props="treeProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defKeys" ref="treeRef"></el-tree>
       <!-- 底部区域 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="setRightDialogVisable = false">取 消</el-button>
-        <el-button type="primary" >确 定</el-button>
+        <el-button type="primary" @click="allocateRights">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -80,7 +80,9 @@ export default {
                 label: 'authName'
             },
             //默认勾选数组
-            defKeys:[]
+            defKeys:[],
+            //即将分配权限的角色ID
+            roleId : ''
         }
     },
     methods: {
@@ -113,6 +115,7 @@ export default {
         },
         //展示分配权限的对话框
         async showSetRightDialog(role){
+            this.roleId = role.id
             const {data: res} = await this.$http.get('rights/tree')
             this.rightsList = res.data
             //console.log(this.rightsList)
@@ -127,6 +130,26 @@ export default {
             node.children.forEach(item=>{
                 this.getLeafKeys(item, arr)
             })
+        },
+        //对话框关闭时清空
+        setRightDialogClose(){
+            this.defKeys = []
+        },
+        //分配权限
+        async allocateRights(){
+            const keys = [
+                ...this.$refs.treeRef.getCheckedKeys(),
+                ...this.$refs.treeRef.getHalfCheckedKeys()
+            ]
+            //console.log(keys)
+            const idStr = keys.join(',')
+            const {data: res} = await this.$http.post(`roles/${this.roleId}/rights`, {rids: idStr})
+            if(res.meta.status !== 200){
+                this.$message.error("分配权限失败！")
+            }
+            this.$message.success("分配权限成功！")
+            this.getRolesList()
+            this.setRightDialogVisable = false
         }
 
     },
